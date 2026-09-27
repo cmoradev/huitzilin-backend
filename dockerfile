@@ -1,5 +1,5 @@
 # Esta es una imagen de node.js
-FROM node:22.13.0-alpine3.21
+FROM node:24.21.0-trixie-slim
 
 # Establece el directorio de trabajo
 WORKDIR /usr/app
