@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  # Postgres Server
+  postgres-server:
+    image: postgres:18.4-trixie
+    ports:
+      - '5432:5432'
+    volumes:
+      - huitzilin-db:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+  # Apex Mono Api
+  apex-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '4000:3000'
+    volumes:
+      - /usr/app/node_modules
+    depends_on:
+      - postgres-server
+    environment:
+      SECRET_KEY: d5b78faed7f61e7d
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/app/src
+        - action: sync
+          path: ./test
+          target: /usr/app/test
+        - action: rebuild
+          path: package.json
+  # Storage Server
+  storage-server:
+    image: registry.digitalocean.com/softmora/utils:storage-ms-90e7fcf
+    ports:
+      - '4100:3000'
+    environment:
+      IAM_ACCESS_KEY: ${IAM_ACCESS_KEY}
+      IAM_SECRET_KEY: ${IAM_SECRET_KEY}
+      AWS_REGION: us-east-1
+      BUCKET_NAME: huitzilin
+
+volumes:
+  huitzilin-db:
