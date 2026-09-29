@@ -1,11 +1,13 @@
-# Imagen base con Corepack habilitado para gestionar pnpm
+# syntax=docker/dockerfile:1.7
+
 FROM node:24.21.0-trixie-slim
 
 ENV PNPM_HOME="/pnpm" \
     PATH="/pnpm:$PATH" \
     CI=true
 
-RUN corepack enable
+# Instala pnpm@11.25.0 explícitamente usando npm solo como bootstrap (sin corepack)
+RUN npm install -g pnpm@11.25.0
 
 WORKDIR /usr/app
 
@@ -13,7 +15,9 @@ WORKDIR /usr/app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Instala dependencias respetando el lockfile (reproducible)
-RUN pnpm install --frozen-lockfile
+# BuildKit cache mount para /pnpm/store con sharing=locked
+RUN --mount=type=cache,target=/pnpm/store,sharing=locked \
+    pnpm install --frozen-lockfile
 
 # Copia el resto del código fuente
 COPY . .
