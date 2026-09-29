@@ -10,9 +10,7 @@ import { getFullname, titleCase } from 'src/common/helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 
 @EventSubscriber()
-export class TeacherEventSubscriber
-  implements EntitySubscriberInterface<Teacher>
-{
+export class TeacherEventSubscriber implements EntitySubscriberInterface<Teacher> {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     this.dataSource.subscribers.push(this);
   }

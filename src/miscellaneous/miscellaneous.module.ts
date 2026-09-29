@@ -6,6 +6,12 @@ import { WebhookModule } from './webhook/webhook.module';
 import { ReportsModule } from './reports/reports.module';
 
 @Module({
-  imports: [DiscountModule, ClipAccountsModule, ClipLinksModule, WebhookModule, ReportsModule],
+  imports: [
+    DiscountModule,
+    ClipAccountsModule,
+    ClipLinksModule,
+    WebhookModule,
+    ReportsModule,
+  ],
 })
 export class MiscellaneousModule {}

@@ -8,9 +8,7 @@ import { Income } from './entities/income.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 
 @EventSubscriber()
-export class IncomeEventSubscriber
-  implements EntitySubscriberInterface<Income>
-{
+export class IncomeEventSubscriber implements EntitySubscriberInterface<Income> {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     this.dataSource.subscribers.push(this);
   }

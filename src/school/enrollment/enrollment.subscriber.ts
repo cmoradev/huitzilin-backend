@@ -11,9 +11,7 @@ import { Debit } from '../debit/entities/debit.entity';
 import { generateDebits } from './helpers';
 
 @EventSubscriber()
-export class EnrollmentEventSubscriber
-  implements EntitySubscriberInterface<Enrollment>
-{
+export class EnrollmentEventSubscriber implements EntitySubscriberInterface<Enrollment> {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     this.dataSource.subscribers.push(this);
   }

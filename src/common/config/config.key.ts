@@ -1,4 +1,4 @@
 export enum ConfigKey {
-    DB = 'database',
-    SECRET_KEY = 'secretKey',
-  }
+  DB = 'database',
+  SECRET_KEY = 'secretKey',
+}
