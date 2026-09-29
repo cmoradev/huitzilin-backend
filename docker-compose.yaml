@@ -16,7 +16,8 @@ services:
   apex-server:
     build:
       context: .
-    command: npm run start:dev
+      dockerfile: Dockerfile.dev
+    command: pnpm run start:dev
     ports:
       - '4000:3000'
     volumes:

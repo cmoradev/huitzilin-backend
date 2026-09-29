@@ -20,7 +20,7 @@ jobs:
         run: echo "TAG=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_ENV
       # Construir la imagen
       - name: 'Build container image'
-        run: docker build -f dockerfile.prod -t registry.digitalocean.com/softmora/apis:huitzilin-${{ env.TAG }} .
+        run: docker build -f Dockerfile.pro -t registry.digitalocean.com/softmora/apis:huitzilin-${{ env.TAG }} .
       # Log In to Registry
       - name: 'Log in to DigitalOcean Container Registry with short-lived credentials'
         run: doctl registry login --expiry-seconds 1200

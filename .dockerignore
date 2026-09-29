@@ -3,3 +3,32 @@
 /node_modules
 
 .env
+
+# Archivos de lock/manifest no utilizados
+package-lock.json
+yarn.lock
+
+# Artefactos de compilación
+/dist
+/build
+/coverage
+
+# Archivos de desarrollo local
+.git
+.github
+.gitattributes
+.gitkeep
+.idea
+.vscode
+*.md
+.eslintcache
+.DS_Store
+
+# Logs y temporales
+*.log
+.tmp
+.temp
+
+# Variables de entorno locales
+.env.local
+.env.*.local

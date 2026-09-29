@@ -5,6 +5,7 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "packageManager": "pnpm@11.25.0",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -19,10 +20,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli",
-    "migration:run": "npm run typeorm migration:run -- -d ./src/common/database/typeorm.ts",
-    "migration:generate": "npm run typeorm -- -d ./src/common/database/typeorm.ts migration:generate ./src/common/database/migrations/migration",
-    "migration:create": "npm run typeorm -- migration:create ./src/common/database/migrations/migration",
-    "migration:revert": "npm run typeorm -- -d ./src/common/database/typeorm.ts migration:revert"
+    "migration:run": "pnpm run typeorm migration:run -- -d ./src/common/database/typeorm.ts",
+    "migration:generate": "pnpm run typeorm -- -d ./src/common/database/typeorm.ts migration:generate ./src/common/database/migrations/migration",
+    "migration:create": "pnpm run typeorm -- migration:create ./src/common/database/migrations/migration",
+    "migration:revert": "pnpm run typeorm -- -d ./src/common/database/typeorm.ts migration:revert"
   },
   "dependencies": {
     "@apollo/server": "^4.13.0",

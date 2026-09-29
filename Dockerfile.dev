@@ -1,0 +1,25 @@
+# Imagen base con Corepack habilitado para gestionar pnpm
+FROM node:24.21.0-trixie-slim
+
+ENV PNPM_HOME="/pnpm" \
+    PATH="/pnpm:$PATH" \
+    CI=true
+
+RUN corepack enable
+
+WORKDIR /usr/app
+
+# Copia manifiestos y lockfile para aprovechar la caché de capas de Docker
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Instala dependencias respetando el lockfile (reproducible)
+RUN pnpm install --frozen-lockfile
+
+# Copia el resto del código fuente
+COPY . .
+
+ENV NODE_ENV=development
+
+EXPOSE 3000
+
+CMD ["pnpm", "run", "start:dev"]
