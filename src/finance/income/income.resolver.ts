@@ -17,9 +17,7 @@ export class IncomeResolver {
     @Args('input', { type: () => AccountsReceivableInput })
     params: AccountsReceivableInput,
   ): Promise<IncomeDto> {
-    return this.incomeService.getAccountsReceivable(
-      params,
-    ) as Promise<IncomeDto>;
+    return this.incomeService.getAccountsReceivable(params);
   }
 
   @Mutation(() => [IncomeDto])

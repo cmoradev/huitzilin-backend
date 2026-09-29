@@ -5,7 +5,7 @@ import { ConfigKey, DatabaseEnvs } from '../config';
 export const DatabaseProvider = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
-  useFactory: (configService: ConfigService) => {
+  useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
     const options = configService.get<DatabaseEnvs>(ConfigKey.DB);
 
     return {
@@ -17,6 +17,6 @@ export const DatabaseProvider = TypeOrmModule.forRootAsync({
       database: options!.database,
       synchronize: false,
       entities: [__dirname + '/../../**/**/entities/*.entity{.ts,.js}'],
-    } as TypeOrmModuleOptions;
+    };
   },
 });
