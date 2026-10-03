@@ -1,7 +1,7 @@
 import { User } from 'src/auth';
 import { Base } from 'src/common/utils/base.entity';
 import { Income } from 'src/finance';
-import { ClipAccount, Discount } from 'src/miscellaneous';
+import { Discount } from 'src/miscellaneous';
 import {
   Debit,
   Discipline,
@@ -62,9 +62,4 @@ export class Branch extends Base {
 
   @ManyToMany(() => Tutor, (tutor) => tutor.branchs)
   tutors: Tutor[];
-
-  @ManyToMany(() => ClipAccount, (clipAccount) => clipAccount.branchs, {
-    cascade: true,
-  })
-  clipAccounts: ClipAccount[];
 }

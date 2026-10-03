@@ -8,7 +8,7 @@ import {
   calculateTotalFromBaseAndTax,
   TaxEnum,
 } from 'src/common/lib/calculations';
-import { ClipAccount, Discount } from 'src/miscellaneous';
+import { Discount } from 'src/miscellaneous';
 import { Debit } from 'src/school';
 import { DebitState } from 'src/school/debit/enums';
 import {
@@ -363,92 +363,6 @@ export const applyPaymentsInIncome = (
     : IncomeState.PENDING;
 
   return income;
-};
-
-export const createLinkClip = (clipAccount: ClipAccount, income: Income) => {
-  const logger = new Logger('Clip');
-
-  return new Promise<LinkClipResponse>((resolve, reject) => {
-    const {
-      token,
-      webhook,
-      success: successUrl,
-      error: errorUrl,
-      default: defaultUrl,
-    } = clipAccount;
-
-    const { pendingPayment, id, concepts } = income;
-
-    const expireDate = endOfDay(addDays(new Date(), 7)).toISOString();
-
-    const purchaseDescription = generatePurchaseDescription(concepts);
-
-    const data = JSON.stringify({
-      amount: pendingPayment,
-      currency: 'MXN',
-      purchase_description: purchaseDescription,
-      webhook_url: webhook,
-      metadata: { external_reference: id },
-      expires_at: expireDate,
-      redirection_url: {
-        success: `${successUrl}/${id}`,
-        error: `${errorUrl}/${id}`,
-        default: `${defaultUrl}`,
-      },
-    });
-
-    const options: RequestOptions = {
-      hostname: 'api.payclip.com',
-      path: '/v2/checkout',
-      method: 'POST',
-      headers: {
-        authorization: `Basic ${token}`,
-        'content-type': 'application/json',
-        accept: 'application/json',
-        'content-length': Buffer.byteLength(data),
-      },
-    };
-
-    const req = request(options, (res) => {
-      let body = '';
-
-      res.on('data', (chunk) => {
-        body += chunk;
-      });
-
-      res.on('end', () => {
-        if (res.statusCode !== 200) {
-          logger.error(`Error al crear el link de pago en Clip: ${body}`);
-          return reject(new Error(`Clip API error: ${res.statusCode}`));
-        }
-
-        try {
-          const response: LinkClipResponse = JSON.parse(body);
-
-          resolve(response);
-        } catch (error) {
-          logger.error(
-            `Error al procesar la respuesta de Clip: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
-            error instanceof Error ? error.stack : undefined,
-          );
-
-          reject(new Error('Error al procesar la respuesta de Clip'));
-        }
-      });
-    });
-
-    req.on('error', (error) => {
-      logger.error(
-        `Error al crear el link de pago en Clip: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
-        error instanceof Error ? error.stack : undefined,
-      );
-
-      reject(error);
-    });
-
-    req.write(data);
-    req.end();
-  });
 };
 
 export const generatePurchaseDescription = (concepts: Concept[]): string => {

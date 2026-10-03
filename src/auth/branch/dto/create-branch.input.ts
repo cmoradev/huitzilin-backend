@@ -12,7 +12,4 @@ export class CreateBranchInput {
   @MaxLength(16)
   @Field(() => String, { nullable: false })
   name: string;
-
-  @Field(() => [NestedIdInput], { nullable: true })
-  clipAccounts: NestedIdInput[];
 }

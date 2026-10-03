@@ -12,7 +12,6 @@ import { IncomeState } from '../enum';
 import { StudentDto } from 'src/school';
 import { ConceptDto } from 'src/finance/concept/dto/concept.dto';
 import { PaymentDto } from 'src/finance/payment/dto/payment.dto';
-import { ClipLinkDto } from 'src/miscellaneous';
 
 @ObjectType('Income')
 @QueryOptions({
@@ -21,7 +20,6 @@ import { ClipLinkDto } from 'src/miscellaneous';
 @FilterableUnPagedRelation('students', () => StudentDto)
 @UnPagedRelation('concepts', () => ConceptDto)
 @UnPagedRelation('payments', () => PaymentDto)
-@UnPagedRelation('clipLinks', () => ClipLinkDto)
 export class IncomeDto extends BaseDto {
   @FilterableField(() => Int, { nullable: false })
   folio: number;

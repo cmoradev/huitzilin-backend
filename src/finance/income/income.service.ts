@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmQueryService } from '@ptc-org/nestjs-query-typeorm';
-import { ClipAccount, ClipLink, Discount } from 'src/miscellaneous';
+import { Discount } from 'src/miscellaneous';
 import { Debit } from 'src/school';
 import { DataSource, In, Repository } from 'typeorm';
 import { CreateConceptInput } from '../concept/dto/create-concept.input';
@@ -10,19 +10,14 @@ import { Payment } from '../payment/entities/payment.entity';
 import { PaymentState } from '../payment/enum';
 import { AddPaymentInput } from './dto';
 import { AccountsReceivableInput } from './dto/accounts-receivable.input';
-import {
-  CreateIncomeInput,
-  CreateLinkIncomeInput,
-} from './dto/create-income.input';
+import { CreateIncomeInput } from './dto/create-income.input';
 import { Income } from './entities/income.entity';
 import {
   applyCalculationsInConcepts,
   applyPaymentsInConcepts,
   applyPaymentsInIncome,
-  buildIncomesWithoutPayments,
   buildIncomesWithPayments,
   conceptToCreateConceptMap,
-  createLinkClip,
   groupByBranchId,
   matchConceptWithDebit,
 } from './helpers';
@@ -39,10 +34,6 @@ export class IncomeService extends TypeOrmQueryService<Income> {
     private readonly _debitRepository: Repository<Debit>,
     @InjectRepository(Discount)
     private readonly _discountRepository: Repository<Discount>,
-    @InjectRepository(ClipAccount)
-    private readonly _clipAccountRepository: Repository<ClipAccount>,
-    @InjectRepository(Concept)
-    private readonly _conceptRepository: Repository<Concept>,
     @InjectDataSource() public dataSource: DataSource,
   ) {
     super(_incomeRepository, { useSoftDelete: true });
@@ -112,22 +103,6 @@ export class IncomeService extends TypeOrmQueryService<Income> {
     return this._saveAddPayment(income, details, payments);
   }
 
-  public async createLinkIncomes(params: CreateLinkIncomeInput) {
-    const { concepts, studentIDs } = params;
-    const groups = await this._buildDetailsGroupByBranch(concepts);
-    const incomes: Income[] = [];
-    for (const [branchID, details] of groups.entries()) {
-      const payload = buildIncomesWithoutPayments(
-        details,
-        branchID,
-        studentIDs,
-      );
-      const income = await this._saveIncome(payload, true);
-      incomes.push(income);
-    }
-    return incomes;
-  }
-
   public async createIncomes(params: CreateIncomeInput) {
     const { concepts, studentIDs } = params;
     const groups = await this._buildDetailsGroupByBranch(concepts);
@@ -148,10 +123,7 @@ export class IncomeService extends TypeOrmQueryService<Income> {
     return incomes;
   }
 
-  private async _saveIncome(
-    payload: CreateIncomePayload,
-    createPaymentLink: boolean = false,
-  ) {
+  private async _saveIncome(payload: CreateIncomePayload) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -220,35 +192,6 @@ export class IncomeService extends TypeOrmQueryService<Income> {
           Concept,
           payloadConcepts,
         );
-
-        if (createPaymentLink) {
-          const clipAccount = await this._getClipAccount(branchId);
-
-          if (!clipAccount) {
-            throw new NotFoundException(
-              '¡No hemos podido encontrar la cuenta CLIP!',
-            );
-          }
-
-          const link = await createLinkClip(clipAccount, income);
-
-          if (link) {
-            const clipLink: ClipLink = await queryRunner.manager.save(
-              ClipLink,
-              {
-                amount: income.pendingPayment,
-                qr: link.qr_image_url,
-                link: link.payment_request_url,
-                expiresAt: new Date(link.expires_at),
-                requestId: link.payment_request_id,
-                incomeId: income.id,
-                accountId: clipAccount.id,
-              },
-            );
-
-            income.clipLinks = [clipLink];
-          }
-        }
       }
 
       if (payments?.length) {
@@ -324,12 +267,6 @@ export class IncomeService extends TypeOrmQueryService<Income> {
 
     return this._discountRepository.find({
       where: { id: In(discountIds) },
-    });
-  }
-
-  private async _getClipAccount(branchId: string) {
-    return this._clipAccountRepository.findOne({
-      where: { branchs: { id: branchId } },
     });
   }
 

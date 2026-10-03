@@ -21,14 +21,6 @@ export class IncomeResolver {
   }
 
   @Mutation(() => [IncomeDto])
-  createLinkIncomes(
-    @Args('input', { type: () => CreateLinkIncomeInput })
-    params: CreateLinkIncomeInput,
-  ): Promise<IncomeDto[]> {
-    return this.incomeService.createLinkIncomes(params);
-  }
-
-  @Mutation(() => [IncomeDto])
   createIncomes(
     @Args('input', { type: () => CreateIncomeInput })
     params: CreateIncomeInput,

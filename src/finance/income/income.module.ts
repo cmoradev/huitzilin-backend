@@ -4,7 +4,7 @@ import {
   PagingStrategies,
 } from '@ptc-org/nestjs-query-graphql';
 import { NestjsQueryTypeOrmModule } from '@ptc-org/nestjs-query-typeorm';
-import { Discount, ClipAccount } from 'src/miscellaneous';
+import { Discount } from 'src/miscellaneous';
 import { Debit } from 'src/school';
 import { IncomeDto } from './dto/income.dto';
 import { Income } from './entities/income.entity';
@@ -21,7 +21,6 @@ import { Concept } from '../concept/entities/concept.entity';
           Income,
           Debit,
           Discount,
-          ClipAccount,
           Concept,
         ]),
       ],

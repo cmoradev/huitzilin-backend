@@ -25,10 +25,15 @@ Crea un archivo `.env` en la raíz del proyecto con las siguientes variables.
 | `DB_PORT`          | Puerto de PostgreSQL (por defecto `5432`).        |
 | `IAM_ACCESS_KEY`   | Access key del servicio de almacenamiento (S3-compatible). |
 | `IAM_SECRET_KEY`   | Secret key asociada al access key anterior.       |
+| `PGADMIN_EMAIL`    | Email de inicio de sesión para `pgAdmin`.         |
+| `PGADMIN_PASSWORD` | Contraseña de inicio de sesión para `pgAdmin`.    |
 
 > Las credenciales IAM son necesarias para el servicio `storage-server`. Si
 > no las defines, el contenedor arrancará igualmente pero las operaciones
 > contra el bucket fallarán.
+>
+> `PGADMIN_EMAIL` y `PGADMIN_PASSWORD` son obligatorios para que el servicio
+> `pgadmin` arranque. Si no los defines, el contenedor fallará al iniciar.
 
 ## Flujo de desarrollo
 
@@ -62,12 +67,26 @@ del Compose).
 | ------------------ | ------------------------------------ | ------------------------ |
 | `postgres-server`  | `postgres:18.4-trixie`               | `5432 → 5432`            |
 | `apex-server`      | Build local (`Dockerfile.dev`)       | `4000 → 3000`            |
-| `storage-server`   | `registry.digitalocean.com/softmora/utils:storage-ms-90e7fcf` | `4100 → 3000` |
+| `storage-server`   | `registry.digitalocean.com/softmora/utils:storage-ms-90e7fcf` | `4100 → 3000`            |
+| `pgadmin`          | `dpage/pgadmin4:8.14`                | `5050 → 80`              |
 
+### Acceso a pgAdmin
+
+Una vez levantado el entorno, abre <http://localhost:5050> e inicia sesión
+con `PGADMIN_EMAIL` y `PGADMIN_PASSWORD`. Para conectarte a la base de
+datos del proyecto registra un nuevo servidor en pgAdmin con los
+siguientes datos (los encuentras en tu `.env`):
+
+- **Host**: `postgres-server`
+- **Port**: `5432`
+- **Maintenance database**: `postgres`
+- **Username**: `DB_USER`
+- **Password**: `DB_PASS`
 ## Datos persistentes
 
 El volumen `huitzilin-db` (definido al final de `compose.dev.yaml`) conserva
-los datos de PostgreSQL entre reinicios. Para un reset completo ejecuta:
+los datos de PostgreSQL entre reinicios. El volumen `pgadmin-data` conserva
+la configuración y caché de pgAdmin. Para un reset completo ejecuta:
 
 ```bash
 docker compose -f compose.dev.yaml down -v
